@@ -1,10 +1,11 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
-export default function NewMessagePage() {
+function NewMessageContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const listingId = searchParams.get('listing_id')
@@ -44,5 +45,13 @@ export default function NewMessagePage() {
                 <button type="button" onClick={handleSend}>Send Message</button>
             </div>
         </main>
+    )
+}
+
+export default function NewMessagePage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <NewMessageContent />
+        </Suspense>
     )
 }
