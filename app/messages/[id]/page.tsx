@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { Send } from 'lucide-react'
 
 export default function ConversationPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter()
@@ -64,7 +65,6 @@ export default function ConversationPage({ params }: { params: Promise<{ id: str
             alert(error.message)
         } else {
             setNewMessage('')
-            // Reload messages
             const { data } = await supabase
                 .from('messages')
                 .select('*')
@@ -76,24 +76,52 @@ export default function ConversationPage({ params }: { params: Promise<{ id: str
     }
 
     return (
-        <main>
-            <h1>Conversation</h1>
-            <div>
-                {messages.map((message: any) => (
-                    <div key={message.id}>
-                        <p>{message.sender_id === userId ? 'You' : 'Them'}: {message.content}</p>
-                    </div>
-                ))}
+        <div className="min-h-screen bg-slate-50 flex flex-col">
+            <div className="max-w-3xl mx-auto w-full px-6 py-12 flex flex-col flex-1">
+
+                {/* Header */}
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold text-slate-900">Conversation</h1>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 flex flex-col gap-3 mb-6">
+                    {messages.map((message: any) => (
+                        <div
+                            key={message.id}
+                            className={`flex ${message.sender_id === userId ? 'justify-end' : 'justify-start'}`}
+                        >
+                            <div className={`max-w-xs px-4 py-3 rounded-2xl text-sm ${
+                                message.sender_id === userId
+                                    ? 'bg-violet-600 text-white rounded-br-sm'
+                                    : 'bg-white border border-slate-100 text-slate-900 rounded-bl-sm'
+                            }`}>
+                                {message.content}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Input */}
+                <div className="bg-white rounded-2xl border border-slate-100 p-4 flex items-center gap-3 shadow-sm">
+                    <input
+                        type="text"
+                        placeholder="Type a message..."
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                        className="flex-1 text-slate-900 placeholder-slate-400 focus:outline-none text-sm"
+                    />
+                    <button
+                        type="button"
+                        onClick={handleSend}
+                        className="bg-violet-600 hover:bg-violet-700 text-white p-2 rounded-xl transition"
+                    >
+                        <Send className="w-4 h-4" />
+                    </button>
+                </div>
+
             </div>
-            <div>
-                <input
-                    type="text"
-                    placeholder="Type a message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                />
-                <button type="button" onClick={handleSend}>Send</button>
-            </div>
-        </main>
+        </div>
     )
 }
