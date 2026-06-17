@@ -77,8 +77,18 @@ export default async function Home() {
             {listings?.map((listing) => (
               <Link key={listing.id} href={`/listings/${listing.id}`}>
                 <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition border border-slate-100 overflow-hidden">
-                  <div className="h-48 bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center">
-                    <Building2 className="w-16 h-16 text-violet-300" />
+                  <div className="h-48 overflow-hidden">
+                    {listing?.image_url ? (
+                      <img
+                        src={listing.image_url}
+                        alt={listing.Title || 'Listing photo'}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center">
+                        <Building2 className="w-16 h-16 text-violet-300" />
+                      </div>
+                    )}
                   </div>
                   <div className="p-5">
                     <h3 className="text-lg font-semibold text-slate-900 mb-1">{listing.Title}</h3>

@@ -10,10 +10,20 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
         <div className="min-h-screen bg-slate-50">
             <div className="max-w-4xl mx-auto px-6 py-12">
                 
-                {/* Image Placeholder */}
-                <div className="w-full h-72 bg-gradient-to-br from-violet-100 to-indigo-100 rounded-2xl flex items-center justify-center mb-8">
-                    <Building2 className="w-24 h-24 text-violet-300" />
-                </div>
+                {/* Images */}
+                {listing?.image_url ? (
+                    <div className="w-full h-72 rounded-2xl overflow-hidden mb-8">
+                        <img
+                            src={listing.image_url}
+                            alt={listing.Title || 'Listing photo'}
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                ) : (
+                    <div className="w-full h-72 bg-gradient-to-br from-violet-100 to-indigo-100 rounded-2xl flex items-center justify-center mb-8">
+                        <Building2 className="w-24 h-24 text-violet-300" />
+                    </div>
+                )}
 
                 <div className="grid md:grid-cols-3 gap-8">
                     
