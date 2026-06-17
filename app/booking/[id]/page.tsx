@@ -54,7 +54,7 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
 
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-[#0075ff] rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <CalendarCheck className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-slate-900">Book Your Stay</h1>
@@ -67,20 +67,20 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
 
                         <div>
                             <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                <CalendarCheck className="w-4 h-4 text-violet-500" />
+                                <CalendarCheck className="w-4 h-4 text-[#0075ff]" />
                                 Move in Date
                             </label>
                             <input
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
                         <div>
                             <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-violet-500" />
+                                <Clock className="w-4 h-4 text-[#0075ff]" />
                                 Duration of Stay (months)
                             </label>
                             <input
@@ -88,13 +88,13 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
                                 placeholder="e.g. 6"
                                 value={duration}
                                 onChange={(e) => setDuration(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
                         <div>
                             <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                <MessageSquare className="w-4 h-4 text-violet-500" />
+                                <MessageSquare className="w-4 h-4 text-[#0075ff]" />
                                 Message to Host (optional)
                             </label>
                             <textarea
@@ -102,18 +102,18 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 rows={4}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff] resize-none"
                             />
                         </div>
 
-                        <div className="bg-violet-50 rounded-xl p-4 text-sm text-violet-700">
+                        <div className="bg-[#eff4ff] rounded-xl p-4 text-sm text-[#0053d1]">
                             💳 You will be redirected to PayFast to pay your deposit securely after confirming.
                         </div>
 
                         <button
                             type="button"
                             onClick={handleBooking}
-                            className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition"
+                            className="w-full bg-[#0075ff] hover:bg-[#0053d1] text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition"
                         >
                             <CalendarCheck className="w-5 h-5" />
                             Confirm Booking

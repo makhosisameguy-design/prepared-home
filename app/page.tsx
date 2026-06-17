@@ -9,17 +9,17 @@ export default async function Home() {
     <div className="min-h-screen bg-slate-50">
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-violet-900/50" />
+      <section className="relative bg-gradient-to-br from-[#0075ff] via-[#0075ff] to-indigo-700 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0053d1]/50" />
         <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
           <div className="max-w-3xl">
             <span className="inline-block bg-white/20 text-white text-sm px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
               🏠 Find your mansion
             </span>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              <span className="block text-violet-200">Prepared Home</span>
+              <span className="block text-[#cce4ff]">Prepared Home</span>
             </h1>
-            <p className="text-xl text-violet-100 mb-10 leading-relaxed">
+            <p className="text-xl text-[#e6f0ff] mb-10 leading-relaxed">
               Connect with verified landlords, explore properties, and find your next home with confidence.
             </p>
            
@@ -42,7 +42,7 @@ export default async function Home() {
                 icon: DollarSign,
                 title: 'Secure Deposits',
                 description: 'Pay deposits safely through our platform with full protection',
-                color: 'bg-violet-100 text-violet-600'
+                color: 'bg-[#e6f0ff] text-[#0075ff]'
               },
               {
                 icon: Building2,
@@ -78,22 +78,55 @@ export default async function Home() {
               <Link key={listing.id} href={`/listings/${listing.id}`}>
                 <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition border border-slate-100 overflow-hidden">
                   <div className="h-48 overflow-hidden">
-                    {listing?.image_url ? (
+                    {(() => {
+                      const rawImage = listing?.image_url
+                      if (rawImage) {
+                        if (typeof rawImage === 'string' && rawImage.startsWith('[')) {
+                          try {
+                            const parsed = JSON.parse(rawImage)
+                            return parsed[0]
+                          } catch {
+                            return rawImage
+                          }
+                        }
+                        if (Array.isArray(rawImage)) {
+                          return rawImage[0]
+                        }
+                        return rawImage
+                      }
+                      return null
+                    })() ? (
                       <img
-                        src={listing.image_url}
+                        src={(() => {
+                          const rawImage = listing?.image_url
+                          if (rawImage) {
+                            if (typeof rawImage === 'string' && rawImage.startsWith('[')) {
+                              try {
+                                return JSON.parse(rawImage)[0]
+                              } catch {
+                                return rawImage
+                              }
+                            }
+                            if (Array.isArray(rawImage)) {
+                              return rawImage[0]
+                            }
+                            return rawImage
+                          }
+                          return ''
+                        })()}
                         alt={listing.Title || 'Listing photo'}
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="h-full bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center">
-                        <Building2 className="w-16 h-16 text-violet-300" />
+                      <div className="h-full bg-gradient-to-br from-[#eff4ff] to-[#d2e7ff] flex items-center justify-center">
+                        <Building2 className="w-16 h-16 text-[#80b3ff]" />
                       </div>
                     )}
                   </div>
                   <div className="p-5">
                     <h3 className="text-lg font-semibold text-slate-900 mb-1">{listing.Title}</h3>
                     <p className="text-slate-500 text-sm mb-3">{listing.Location}</p>
-                    <p className="text-violet-600 font-bold text-xl">R {listing.Price}</p>
+                    <p className="text-[#0075ff] font-bold text-xl">R {listing.Price}</p>
                   </div>
                 </div>
               </Link>
@@ -112,7 +145,7 @@ export default async function Home() {
             Join thousands of happy tenants and landlords on Prepared Home
           </p>
           <Link href="/signup">
-            <button className="bg-violet-600 hover:bg-violet-700 h-14 px-10 rounded-xl text-lg font-semibold text-white flex items-center gap-2 mx-auto">
+            <button className="bg-[#0075ff] hover:bg-[#0053d1] h-14 px-10 rounded-xl text-lg font-semibold text-white flex items-center gap-2 mx-auto">
               Get Started Free
               <ArrowRight className="w-5 h-5" />
             </button>

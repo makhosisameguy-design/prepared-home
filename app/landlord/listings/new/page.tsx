@@ -17,7 +17,7 @@ export default function NewListingPage() {
     const [availabilityDate, setAvailabilityDate] = useState('')
     const [deposit, setDeposit] = useState('')
     const [requirements, setRequirements] = useState('')
-    const [imageFile, setImageFile] = useState<File | null>(null)
+    const [imageFiles, setImageFiles] = useState<File[]>([])
 
 
     async function handleCreate() {
@@ -27,25 +27,37 @@ export default function NewListingPage() {
         return
     }
 
-    let imageUrl = ''
+    let imageUrls: string[] = []
 
-    if (imageFile) {
-        const fileName = `${data.session.user.id}/${Date.now()}-${imageFile.name}`
-        const { error: uploadError } = await supabase.storage
-            .from('listing-photos')
-            .upload(fileName, imageFile)
+    if (imageFiles.length > 0) {
+        try {
+            const uploadedUrls = await Promise.all(
+                imageFiles.map(async (file, index) => {
+                    const fileName = `${data.session.user.id}/${Date.now()}-${index}-${file.name}`
+                    const { error: uploadError } = await supabase.storage
+                        .from('listing-photos')
+                        .upload(fileName, file)
 
-        if (uploadError) {
-            alert(uploadError.message)
+                    if (uploadError) {
+                        throw uploadError
+                    }
+
+                    const { data: urlData } = supabase.storage
+                        .from('listing-photos')
+                        .getPublicUrl(fileName)
+
+                    return urlData.publicUrl
+                })
+            )
+
+            imageUrls = uploadedUrls.filter(Boolean)
+        } catch (uploadError: any) {
+            alert(uploadError.message || 'Failed to upload images.')
             return
         }
-
-        const { data: urlData } = supabase.storage
-            .from('listing-photos')
-            .getPublicUrl(fileName)
-
-        imageUrl = urlData.publicUrl
     }
+
+    const imageField = imageUrls.length > 1 ? JSON.stringify(imageUrls) : imageUrls[0] || ''
 
     const { error } = await supabase.from('Listings').insert({
         Title: title,
@@ -60,7 +72,7 @@ export default function NewListingPage() {
         availability_date: availabilityDate,
         deposit: deposit,
         requirements: requirements,
-        image_url: imageUrl,
+        image_url: imageField,
     })
     if (error) {
         alert(error.message)
@@ -74,7 +86,7 @@ export default function NewListingPage() {
             <div className="w-full max-w-lg">
 
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-[#0075ff] rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <Building2 className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-slate-900">Create a Listing</h1>
@@ -89,7 +101,7 @@ export default function NewListingPage() {
                             <select
                                 value={accommodationType}
                                 onChange={(e) => setAccommodationType(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             >
                                 <option value="room">Room</option>
                                 <option value="house">Standalone house</option>
@@ -101,7 +113,7 @@ export default function NewListingPage() {
 
                         <div>
                             <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                <Building2 className="w-4 h-4 text-violet-500" />
+                                <Building2 className="w-4 h-4 text-[#0075ff]" />
                                 Property Name
                             </label>
                             <input
@@ -109,7 +121,7 @@ export default function NewListingPage() {
                                 placeholder="e.g. Sandton Conference Room"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
@@ -121,7 +133,7 @@ export default function NewListingPage() {
                                     placeholder="e.g. 2"
                                     value={rooms}
                                     onChange={(e) => setRooms(e.target.value)}
-                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                                 />
                             </div>
                             <div>
@@ -131,14 +143,14 @@ export default function NewListingPage() {
                                     placeholder="e.g. ensuite"
                                     value={roomType}
                                     onChange={(e) => setRoomType(e.target.value)}
-                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                                 />
                             </div>
                         </div>
 
                         <div>
                             <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                <MapPin className="w-4 h-4 text-violet-500" />
+                                <MapPin className="w-4 h-4 text-[#0075ff]" />
                                 Location (suburb/city)
                             </label>
                             <input
@@ -146,7 +158,7 @@ export default function NewListingPage() {
                                 placeholder="e.g. Sandton, Johannesburg"
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
@@ -157,13 +169,13 @@ export default function NewListingPage() {
                                 placeholder="Street address"
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
                         <div>
                             <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                <ListChecks className="w-4 h-4 text-violet-500" />
+                                <ListChecks className="w-4 h-4 text-[#0075ff]" />
                                 Amenities (comma separated)
                             </label>
                             <input
@@ -171,14 +183,14 @@ export default function NewListingPage() {
                                 placeholder="e.g. WiFi, Parking, Furnished"
                                 value={amenities}
                                 onChange={(e) => setAmenities(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                    <DollarSign className="w-4 h-4 text-violet-500" />
+                                    <DollarSign className="w-4 h-4 text-[#0075ff]" />
                                     Monthly Price (R)
                                 </label>
                                 <input
@@ -186,7 +198,7 @@ export default function NewListingPage() {
                                     placeholder="e.g. 5000"
                                     value={price}
                                     onChange={(e) => setPrice(e.target.value)}
-                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                                 />
                             </div>
                             <div>
@@ -196,21 +208,21 @@ export default function NewListingPage() {
                                     placeholder="e.g. 5000"
                                     value={deposit}
                                     onChange={(e) => setDeposit(e.target.value)}
-                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                                 />
                             </div>
                         </div>
 
                         <div>
                             <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-violet-500" />
+                                <Calendar className="w-4 h-4 text-[#0075ff]" />
                                 Available From
                             </label>
                             <input
                                 type="date"
                                 value={availabilityDate}
                                 onChange={(e) => setAvailabilityDate(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
@@ -221,22 +233,23 @@ export default function NewListingPage() {
                                 value={requirements}
                                 onChange={(e) => setRequirements(e.target.value)}
                                 rows={3}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff] resize-none"
                             />
                         </div>
                         <div>
-                                <label className="text-sm font-medium text-slate-700 mb-1 block">Property Photo</label>
+                                <label className="text-sm font-medium text-slate-700 mb-1 block">Property Photos</label>
                                  <input
                                     type="file"
                                     accept="image/*"
-                                    onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"/>
+                                    multiple
+                                    onChange={(e) => setImageFiles(e.target.files ? Array.from(e.target.files) : [])}
+                                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"/>
                         </div>
 
                         <button
                             type="button"
                             onClick={handleCreate}
-                            className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-2"
+                            className="w-full bg-[#0075ff] hover:bg-[#0053d1] text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-2"
                         >
                             <Plus className="w-5 h-5" />
                             Create Listing

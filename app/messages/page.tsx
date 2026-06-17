@@ -46,11 +46,11 @@ export default function MessagesPage() {
                 ) : (
                     <div className="flex flex-col gap-3">
                         {messages.map((message: any) => (
-                            <div key={message.id} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm hover:border-violet-200 transition">
+                            <div key={message.id} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm hover:border-[#b3d7ff] transition">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
-                                            <Building2 className="w-5 h-5 text-violet-600" />
+                                        <div className="w-10 h-10 bg-[#e6f0ff] rounded-xl flex items-center justify-center">
+                                            <Building2 className="w-5 h-5 text-[#0075ff]" />
                                         </div>
                                         <div>
                                             <p className="font-semibold text-slate-900">{message.Listings?.Title}</p>
@@ -58,7 +58,7 @@ export default function MessagesPage() {
                                         </div>
                                     </div>
                                     <Link href={`/messages/${message.id}`}>
-                                        <button className="flex items-center gap-1 text-violet-600 hover:text-violet-700 text-sm font-medium transition">
+                                        <button className="flex items-center gap-1 text-[#0075ff] hover:text-[#0053d1] text-sm font-medium transition">
                                             View
                                             <ArrowRight className="w-4 h-4" />
                                         </button>

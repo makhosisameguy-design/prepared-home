@@ -93,7 +93,7 @@ export default function ConversationPage({ params }: { params: Promise<{ id: str
                         >
                             <div className={`max-w-xs px-4 py-3 rounded-2xl text-sm ${
                                 message.sender_id === userId
-                                    ? 'bg-violet-600 text-white rounded-br-sm'
+                                    ? 'bg-[#0075ff] text-white rounded-br-sm'
                                     : 'bg-white border border-slate-100 text-slate-900 rounded-bl-sm'
                             }`}>
                                 {message.content}
@@ -115,7 +115,7 @@ export default function ConversationPage({ params }: { params: Promise<{ id: str
                     <button
                         type="button"
                         onClick={handleSend}
-                        className="bg-violet-600 hover:bg-violet-700 text-white p-2 rounded-xl transition"
+                        className="bg-[#0075ff] hover:bg-[#0053d1] text-white p-2 rounded-xl transition"
                     >
                         <Send className="w-4 h-4" />
                     </button>

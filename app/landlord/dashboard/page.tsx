@@ -45,7 +45,7 @@ export default function LandlordDashboardPage() {
                         <p className="text-slate-500 mt-1">Manage your rental properties</p>
                     </div>
                     <Link href="/landlord/listings/new">
-                        <button className="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold px-5 py-3 rounded-xl transition">
+                        <button className="flex items-center gap-2 bg-[#0075ff] hover:bg-[#0053d1] text-white font-semibold px-5 py-3 rounded-xl transition">
                             <Plus className="w-5 h-5" />
                             New Listing
                         </button>
@@ -59,7 +59,7 @@ export default function LandlordDashboardPage() {
                         <h3 className="text-lg font-medium text-slate-900 mb-2">No listings yet</h3>
                         <p className="text-slate-500 mb-6">Create your first listing to start renting</p>
                         <Link href="/landlord/listings/new">
-                            <button className="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold px-5 py-3 rounded-xl transition mx-auto">
+                            <button className="flex items-center gap-2 bg-[#0075ff] hover:bg-[#0053d1] text-white font-semibold px-5 py-3 rounded-xl transition mx-auto">
                                 <Plus className="w-5 h-5" />
                                 Create Listing
                             </button>
@@ -76,11 +76,11 @@ export default function LandlordDashboardPage() {
                                             <MapPin className="w-4 h-4" />
                                             {listing?.Location}
                                         </div>
-                                        <p className="text-violet-600 font-bold text-xl">R {listing?.Price}</p>
+                                        <p className="text-[#0075ff] font-bold text-xl">R {listing?.Price}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Link href={`/landlord/listings/${listing.id}/edit`}>
-                                            <button className="flex items-center gap-1 border border-slate-200 text-slate-600 hover:border-violet-300 hover:text-violet-600 text-sm font-medium px-4 py-2 rounded-xl transition">
+                                            <button className="flex items-center gap-1 border border-slate-200 text-slate-600 hover:border-[#7fb8ff] hover:text-[#0075ff] text-sm font-medium px-4 py-2 rounded-xl transition">
                                                 <Pencil className="w-4 h-4" />
                                                 Edit
                                             </button>

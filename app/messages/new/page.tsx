@@ -40,7 +40,7 @@ function NewMessageContent() {
 
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-[#0075ff] rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <MessageSquare className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-slate-900">Contact Landlord</h1>
@@ -59,14 +59,14 @@ function NewMessageContent() {
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
                                 rows={6}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff] resize-none"
                             />
                         </div>
 
                         <button
                             type="button"
                             onClick={handleSend}
-                            className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition"
+                            className="w-full bg-[#0075ff] hover:bg-[#0053d1] text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition"
                         >
                             <Send className="w-5 h-5" />
                             Send Message

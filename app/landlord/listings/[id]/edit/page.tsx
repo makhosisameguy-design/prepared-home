@@ -45,7 +45,7 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
 
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-[#0075ff] rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <Building2 className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-slate-900">Edit Listing</h1>
@@ -58,7 +58,7 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
 
                         <div>
                             <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                <Building2 className="w-4 h-4 text-violet-500" />
+                                <Building2 className="w-4 h-4 text-[#0075ff]" />
                                 Property Name
                             </label>
                             <input
@@ -66,13 +66,13 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
                                 placeholder="e.g. Sandton Conference Room"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
                         <div>
                             <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                <MapPin className="w-4 h-4 text-violet-500" />
+                                <MapPin className="w-4 h-4 text-[#0075ff]" />
                                 Location
                             </label>
                             <input
@@ -80,13 +80,13 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
                                 placeholder="e.g. Sandton, Johannesburg"
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
                         <div>
                             <label className="text-sm font-medium text-slate-700 mb-1 block flex items-center gap-2">
-                                <DollarSign className="w-4 h-4 text-violet-500" />
+                                <DollarSign className="w-4 h-4 text-[#0075ff]" />
                                 Monthly Price (R)
                             </label>
                             <input
@@ -94,14 +94,14 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
                                 placeholder="e.g. 5000"
                                 value={price}
                                 onChange={(e) => setPrice(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
                         <button
                             type="button"
                             onClick={handleUpdate}
-                            className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-2"
+                            className="w-full bg-[#0075ff] hover:bg-[#0053d1] text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-2"
                         >
                             <Save className="w-5 h-5" />
                             Save Changes

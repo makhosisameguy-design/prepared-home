@@ -28,7 +28,7 @@ export default function LoginPage() {
 
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-[#0075ff] rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <Home className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
@@ -45,7 +45,7 @@ export default function LoginPage() {
                                 placeholder="john@example.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
                         <div>
@@ -55,13 +55,13 @@ export default function LoginPage() {
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
                         <button
                             onClick={handleLogin}
-                            className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-2"
+                            className="w-full bg-[#0075ff] hover:bg-[#0053d1] text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-2"
                         >
                             <LogIn className="w-5 h-5" />
                             Log In
@@ -71,7 +71,7 @@ export default function LoginPage() {
 
                 <p className="text-center text-slate-500 text-sm mt-6">
                     Don't have an account?{' '}
-                    <Link href="/signup" className="text-violet-600 hover:text-violet-700 font-medium">
+                    <Link href="/signup" className="text-[#0075ff] hover:text-[#0053d1] font-medium">
                         Sign up
                     </Link>
                 </p>

@@ -36,7 +36,7 @@ export default function SignupPage() {
 
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-[#0075ff] rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <Home className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-slate-900">Create an account</h1>
@@ -56,8 +56,8 @@ export default function SignupPage() {
                                     onClick={() => setAccountType('tenant')}
                                     className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 font-medium transition ${
                                         accountType === 'tenant'
-                                            ? 'border-violet-600 bg-violet-50 text-violet-600'
-                                            : 'border-slate-200 text-slate-500 hover:border-violet-300'
+                                            ? 'border-[#0075ff] bg-[#eff4ff] text-[#0075ff]'
+                                            : 'border-slate-200 text-slate-500 hover:border-[#7fb8ff]'
                                     }`}
                                 >
                                     <User className="w-4 h-4" />
@@ -68,8 +68,8 @@ export default function SignupPage() {
                                     onClick={() => setAccountType('landlord')}
                                     className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 font-medium transition ${
                                         accountType === 'landlord'
-                                            ? 'border-violet-600 bg-violet-50 text-violet-600'
-                                            : 'border-slate-200 text-slate-500 hover:border-violet-300'
+                                            ? 'border-[#0075ff] bg-[#eff4ff] text-[#0075ff]'
+                                            : 'border-slate-200 text-slate-500 hover:border-[#7fb8ff]'
                                     }`}
                                 >
                                     <Building2 className="w-4 h-4" />
@@ -85,7 +85,7 @@ export default function SignupPage() {
                                 placeholder="John Doe"
                                 value={fullName}
                                 onChange={(e) => setFullName(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
                         <div>
@@ -95,7 +95,7 @@ export default function SignupPage() {
                                 placeholder="john@example.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
                         <div>
@@ -105,13 +105,13 @@ export default function SignupPage() {
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff]"
                             />
                         </div>
 
                         <button
                             onClick={handleSignup}
-                            className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-2"
+                            className="w-full bg-[#0075ff] hover:bg-[#0053d1] text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-2"
                         >
                             <UserPlus className="w-5 h-5" />
                             Sign Up
@@ -121,7 +121,7 @@ export default function SignupPage() {
 
                 <p className="text-center text-slate-500 text-sm mt-6">
                     Already have an account?{' '}
-                    <Link href="/login" className="text-violet-600 hover:text-violet-700 font-medium">
+                    <Link href="/login" className="text-[#0075ff] hover:text-[#0053d1] font-medium">
                         Log in
                     </Link>
                 </p>

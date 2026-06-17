@@ -65,11 +65,11 @@ export default function DashboardPage() {
                                 </div>
                                 <div className="flex items-center gap-6 text-sm text-slate-500">
                                     <div className="flex items-center gap-1">
-                                        <CalendarCheck className="w-4 h-4 text-violet-500" />
+                                        <CalendarCheck className="w-4 h-4 text-[#0075ff]" />
                                         {booking.date}
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <Clock className="w-4 h-4 text-violet-500" />
+                                        <Clock className="w-4 h-4 text-[#0075ff]" />
                                         {booking.duration} months
                                     </div>
                                 </div>
