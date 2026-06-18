@@ -10,6 +10,7 @@ export default function Navbar() {
     const router = useRouter()
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
+    const [hideNav, setHideNav] = useState(false)
 
    useEffect(() => {
     async function checkSession() {
@@ -27,10 +28,22 @@ export default function Navbar() {
     return () => subscription.unsubscribe()
 }, [])
 
+useEffect(() => {
+    if (typeof window === 'undefined') return
+    const path = window.location.pathname || ''
+    if (path.startsWith('/booking/success') || path.startsWith('/booking/cancel')) {
+        setHideNav(true)
+    } else {
+        setHideNav(false)
+    }
+}, [])
+
     async function handleLogout() {
         await supabase.auth.signOut()
         router.push('/')
     }
+
+    if (hideNav) return null
 
     return (
         <nav className="bg-white border-b border-slate-100 sticky top-0 z-50 relative">

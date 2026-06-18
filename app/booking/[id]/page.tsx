@@ -36,13 +36,15 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
         if (error) {
             alert(error.message)
         } else {
+            const origin = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_BASE_URL || 'https://prepared-home.vercel.app'
+
             const payfastparams = new URLSearchParams({
                 merchant_id: process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_ID!,
                 merchant_key: process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_KEY!,
                 amount: '500.00',
                 item_name: 'Rental Deposit',
-                return_url: 'https://prepared-home.vercel.app/booking/success',
-                cancel_url: 'https://prepared-home.vercel.app/booking/cancel',
+                return_url: `${origin}/booking/success`,
+                cancel_url: `${origin}/booking/cancel`,
             })
             window.location.href = `https://sandbox.payfast.co.za/eng/process?${payfastparams}`
         }

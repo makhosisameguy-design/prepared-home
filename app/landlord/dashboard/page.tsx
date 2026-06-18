@@ -87,7 +87,7 @@ export default function LandlordDashboardPage() {
         const channel = supabase
             .channel('public:bookings-listener')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'Bookings' }, (payload) => {
-                const changedListingId = payload.new?.listing_id ?? payload.old?.listing_id
+                const changedListingId = (payload.new as any)?.listing_id ?? (payload.old as any)?.listing_id
                 if (listingIds.includes(changedListingId)) {
                     // Re-fetch pending requests for current listings
                     fetchBookingRequests(listingIds)
@@ -118,7 +118,7 @@ export default function LandlordDashboardPage() {
             return
         }
 
-        const bookingRequest = bookingRequests.find((request) => request.id === bookingId)
+        const bookingRequest = bookingRequests.find((request) => request.id === bookingId) as any
         if (!bookingRequest) {
             setRequestLoading((prev) => ({ ...prev, [bookingId]: false }))
             setRequestBanner({ type: 'error', message: 'Unable to find the booking request.' })
