@@ -16,7 +16,7 @@ export default function NewListingPage() {
     const [amenities, setAmenities] = useState('')
     const [availabilityDate, setAvailabilityDate] = useState('')
     const [deposit, setDeposit] = useState('')
-    const [requirements, setRequirements] = useState('')
+    const [aboutProperty, setAboutProperty] = useState('')
     const [imageFiles, setImageFiles] = useState<File[]>([])
 
 
@@ -58,6 +58,7 @@ export default function NewListingPage() {
     }
 
     const imageField = imageUrls.length > 1 ? JSON.stringify(imageUrls) : imageUrls[0] || ''
+    const landlordName = (data.session.user.user_metadata?.full_name as string) || data.session.user.email || 'Property Owner'
 
     const { error } = await supabase.from('Listings').insert({
         Title: title,
@@ -71,7 +72,7 @@ export default function NewListingPage() {
         amenities: amenities,
         availability_date: availabilityDate,
         deposit: deposit,
-        requirements: requirements,
+        about_property: aboutProperty,
         image_url: imageField,
     })
     if (error) {
@@ -227,11 +228,11 @@ export default function NewListingPage() {
                         </div>
 
                         <div>
-                            <label className="text-sm font-medium text-slate-700 mb-1 block">Requirements before move-in</label>
+                            <label className="text-sm font-medium text-slate-700 mb-1 block">About Property</label>
                             <textarea
                                 placeholder="e.g. First and last month's rent, proof of income"
-                                value={requirements}
-                                onChange={(e) => setRequirements(e.target.value)}
+                                value={aboutProperty}
+                                onChange={(e) => setAboutProperty(e.target.value)}
                                 rows={3}
                                 className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0075ff] resize-none"
                             />

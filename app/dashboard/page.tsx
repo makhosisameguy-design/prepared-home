@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { MapPin, CalendarCheck, Clock, Building2, DollarSign, Home } from 'lucide-react'
+import { MapPin, CalendarCheck, Clock, Building2, DollarSign, Home, Calendar, User } from 'lucide-react'
 import ListingCarousel from '@/app/components/ListingCarousel'
 
 // Helper function to parse image URLs from listing
@@ -75,16 +75,28 @@ export default function DashboardPage() {
 
                                         {/* Listing Details */}
                                         <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
-                                            {booking.Listings?.rooms && (
-                                                <div className="flex items-center gap-2 text-slate-600">
-                                                    <Building2 className="w-4 h-4 text-[#0075ff]" />
-                                                    <span>{booking.Listings.rooms} rooms</span>
-                                                </div>
-                                            )}
                                             {booking.Listings?.room_type && (
                                                 <div className="flex items-center gap-2 text-slate-600">
                                                     <Home className="w-4 h-4 text-[#0075ff]" />
                                                     <span>{booking.Listings.room_type}</span>
+                                                </div>
+                                            )}
+                                            {booking.Listings?.availability_date && (
+                                                <div className="flex items-center gap-2 text-slate-600">
+                                                    <Calendar className="w-4 h-4 text-[#0075ff]" />
+                                                    <span>{new Date(booking.Listings.availability_date).toLocaleDateString()}</span>
+                                                </div>
+                                            )}
+                                            {booking.Listings?.landlord_name && (
+                                                <div className="col-span-2 flex items-center gap-2 text-slate-600">
+                                                    <User className="w-4 h-4 text-[#0075ff]" />
+                                                    <span>Landlord: {booking.Listings?.landlord_name}</span>
+                                                </div>
+                                            )}
+                                            {booking.Listings?.rooms && (
+                                                <div className="flex items-center gap-2 text-slate-600">
+                                                    <Building2 className="w-4 h-4 text-[#0075ff]" />
+                                                    <span>{booking.Listings.rooms} rooms</span>
                                                 </div>
                                             )}
                                             {booking.Listings?.amenities && (

@@ -9,23 +9,60 @@ import Image from 'next/image'
 export default function Navbar() {
     const router = useRouter()
     const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [isLandlord, setIsLandlord] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
     const [hideNav, setHideNav] = useState(false)
 
    useEffect(() => {
     async function checkSession() {
         const { data } = await supabase.auth.getSession()
-        setIsLoggedIn(!!data.session)
+        const session = data.session
+        setIsLoggedIn(!!session)
+
+        if (session) {
+            const accountType = (session.user.user_metadata as any)?.account_type
+if (accountType === 'landlord')  {
+                setIsLandlord(true)
+            } else {
+                try {
+                    const { data: listingsData } = await supabase.from('Listings').select('id').eq('landlord_id', session.user.id).limit(1)
+                    setIsLandlord(!!(listingsData && listingsData.length > 0))
+                } catch (err) {
+                    setIsLandlord(false)
+                }
+            }
+        } else {
+            setIsLandlord(false)
+        }
     }
     checkSession()
 
     // Listen for login/logout changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
         setIsLoggedIn(!!session)
+        if (session) {
+            const accountType = (session.user.user_metadata as any)?.account_type
+            if (accountType === 'landlord') {
+                setIsLandlord(true)
+            } else {
+                ;(async () => {
+    try {
+        const { data: listingsData } = await supabase.from('Listings').select('id').eq('landlord_id', session.user.id).limit(1)
+            setIsLandlord(!!(listingsData && listingsData.length > 0))
+            } catch {
+                setIsLandlord(false)
+            }
+        })()
+            }
+        } else {
+            setIsLandlord(false)
+        }
     })
 
     // Cleanup listener when navbar unmounts
-    return () => subscription.unsubscribe()
+    return () => {
+        subscription.unsubscribe()
+    }
 }, [])
 
 useEffect(() => {
@@ -77,10 +114,12 @@ useEffect(() => {
                                 <LayoutDashboard className="w-4 h-4" />
                                 My Bookings
                             </Link>
-                            <Link href="/landlord/dashboard" className="flex items-center gap-1 text-slate-600 hover:text-[#0075ff] text-sm font-medium transition">
-                                <Building2 className="w-4 h-4" />
-                                Landlord
-                            </Link>
+                            {isLandlord && (
+                                <Link href="/landlord/dashboard" className="flex items-center gap-1 text-slate-600 hover:text-[#0075ff] text-sm font-medium transition">
+                                    <Building2 className="w-4 h-4" />
+                                    Landlord
+                                </Link>
+                            )}
                         </>
                     )}
 
@@ -118,10 +157,12 @@ useEffect(() => {
                             <LayoutDashboard className="w-4 h-4" />
                             My Bookings
                         </Link>
-                        <Link href="/landlord/dashboard" className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
-                            <Building2 className="w-4 h-4" />
-                            Landlord
-                        </Link>
+                        {isLandlord && (
+                            <Link href="/landlord/dashboard" className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
+                                <Building2 className="w-4 h-4" />
+                                Landlord
+                            </Link>
+                        )}
                     </>
                 )}
 

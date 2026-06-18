@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import ListingCarousel from '@/app/components/ListingCarousel'
 import { supabase } from '@/lib/supabase'
-import { MapPin, DollarSign, Building2, MessageSquare, CalendarCheck } from 'lucide-react'
+import { MapPin, DollarSign, Building2, MessageSquare, CalendarCheck, Calendar, User, HomeIcon } from 'lucide-react'
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const { data: listing } = await supabase.from('Listings').select('*').eq('id', id).single()
+    const landlordId = listing?.landlord_id
+
     let images: string[] = []
 
     if (listing?.image_url) {
@@ -48,9 +50,61 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                         </div>
 
                         <div className="bg-white rounded-2xl border border-slate-100 p-6 mb-6">
-                            <h2 className="text-lg font-semibold text-slate-900 mb-4">About this property</h2>
-                            <p className="text-slate-500">A great space available for rent in {listing.Location}.</p>
+                            <h2 className="text-lg font-semibold text-slate-900 mb-4">Property Details</h2>
+                        
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            {(listing.about_property || listing.requirements) && (
+                                <div className="rounded-2xl bg-slate-50 p-4 sm:col-span-2">
+                                  <p className="text-sm text-slate-500">About this property</p>
+                                  <p className="mt-1 text-slate-900">{listing.about_property || listing.requirements}</p>
+                                </div>
+                              )}
+
+                              {listing.accommodation_type && (
+                                <div className="rounded-2xl bg-slate-50 p-4">
+                                  <p className="text-sm text-slate-500">Accommodation Type</p>
+                                  <p className="mt-1 font-medium text-slate-900">{listing.accommodation_type}</p>
+                                </div>
+                              )}
+                              {listing.room_type && (
+                                <div className="rounded-2xl bg-slate-50 p-4">
+                                  <p className="text-sm text-slate-500">Room Type</p>
+                                  <p className="mt-1 font-medium text-slate-900">{listing.room_type}</p>
+                                </div>
+                              )}
+                              {listing.rooms && (
+                                <div className="rounded-2xl bg-slate-50 p-4">
+                                  <p className="text-sm text-slate-500">Number of Rooms</p>
+                                  <p className="mt-1 font-medium text-slate-900">{listing.rooms}</p>
+                                </div>
+                              )}
+                              {listing.address && (
+                                <div className="rounded-2xl bg-slate-50 p-4 sm:col-span-2">
+                                  <p className="text-sm text-slate-500">Full Address</p>
+                                  <p className="mt-1 font-medium text-slate-900">{listing.address}</p>
+                                </div>
+                              )}
+                              {listing.availability_date && (
+                                <div className="rounded-2xl bg-slate-50 p-4">
+                                  <p className="text-sm text-slate-500">Available From</p>
+                                  <p className="mt-1 font-medium text-slate-900">{new Date(listing.availability_date).toLocaleDateString()}</p>
+                                </div>
+                              )}
+                              {listing.deposit && (
+                                <div className="rounded-2xl bg-slate-50 p-4">
+                                  <p className="text-sm text-slate-500">Deposit</p>
+                                  <p className="mt-1 font-medium text-slate-900">R {listing.deposit}</p>
+                                </div>
+                              )}
+                              {listing.amenities && (
+                                <div className="rounded-2xl bg-slate-50 p-4 sm:col-span-2">
+                                  <p className="text-sm text-slate-500">Amenities</p>
+                                  <p className="mt-1 font-medium text-slate-900">{listing.amenities}</p>
+                                </div>
+                              )}
+                            </div>
                         </div>
+
                     </div>
 
                     {/* Booking Card */}

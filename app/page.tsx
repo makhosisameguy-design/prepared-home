@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { Search, Shield, DollarSign, Building2, ArrowRight } from 'lucide-react'
+import { Search, Shield, DollarSign, Building2, ArrowRight, MapPin, Calendar, User, HomeIcon } from 'lucide-react'
 
 export default async function Home() {
   const { data: listings } = await supabase.from('Listings').select('*')
@@ -14,7 +14,7 @@ export default async function Home() {
         <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
           <div className="max-w-3xl">
             <span className="inline-block bg-white/20 text-white text-sm px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
-              🏠 Find your mansion
+              Find your mansion
             </span>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
               <span className="block text-[#cce4ff]">Prepared Home</span>
@@ -125,7 +125,35 @@ export default async function Home() {
                   </div>
                   <div className="p-5">
                     <h3 className="text-lg font-semibold text-slate-900 mb-1">{listing.Title}</h3>
-                    <p className="text-slate-500 text-sm mb-3">{listing.Location}</p>
+
+                  {(listing.about_property || listing.requirements) && (
+                      <h4 className="text-slate-500 text-sm mb-3 line-clamp-2">{listing.about_property || listing.requirements}</h4>
+                    )}
+                    
+                    <div className="flex items-center gap-2 text-slate-500 text-sm mb-2">
+                      <MapPin className="w-4 h-4 flex-shrink-0" />
+                      <span>{listing.Location}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-slate-500 text-sm mb-2">
+                      <HomeIcon className="w-4 h-4 flex-shrink-0" />
+                      <span>{listing.room_type || listing.accommodation_type || 'Room'}</span>
+                    </div>
+
+                    {listing.availability_date && (
+                      <div className="flex items-center gap-2 text-slate-500 text-sm mb-2">
+                        <Calendar className="w-4 h-4 flex-shrink-0" />
+                        <span>{new Date(listing.availability_date).toLocaleDateString()}</span>
+                      </div>
+                    )}
+
+                    {listing.landlord_name && (
+                      <div className="flex items-center gap-2 text-slate-500 text-sm mb-3">
+                        <User className="w-4 h-4 flex-shrink-0" />
+                        <span>{listing.landlord_name}</span>
+                      </div>
+                    )}
+
                     <p className="text-[#0075ff] font-bold text-xl">R {listing.Price}</p>
                   </div>
                 </div>

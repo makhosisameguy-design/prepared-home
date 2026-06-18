@@ -26,7 +26,7 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
             return
         }
         const { error } = await supabase.from('Bookings').insert({
-            listing_id: listingId,
+            listing_id: Number(listingId),
             tenant_id: data.session?.user.id,
             date: date,
             duration: duration,

@@ -84,13 +84,26 @@ export default function LandlordDashboardPage() {
 
         const listingIds = listings.map((l) => l.id)
 
-        const channel = supabase
-            .channel('public:bookings-listener')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'Bookings' }, (payload) => {
-                const changedListingId = (payload.new as any)?.listing_id ?? (payload.old as any)?.listing_id
-                if (listingIds.includes(changedListingId)) {
-                    // Re-fetch pending requests for current listings
-                    fetchBookingRequests(listingIds)
+        // Subscribe to INSERT and UPDATE events and log payloads for debugging
+        const channel = supabase.channel('public:bookings-listener')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Bookings' }, (payload) => {
+                console.log('Bookings realtime (INSERT) payload:', payload)
+                const rawId = (payload.new as any)?.listing_id ?? (payload.old as any)?.listing_id
+                const changedListingId = typeof rawId === 'string' ? Number(rawId) : rawId
+                const listingIdsNum = listingIds.map((id) => Number(id))
+                console.log('Changed listing id:', changedListingId, 'Listing IDs:', listingIdsNum)
+                if (!Number.isNaN(changedListingId) && listingIdsNum.includes(changedListingId)) {
+                    fetchBookingRequests(listingIdsNum)
+                }
+            })
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'Bookings' }, (payload) => {
+                console.log('Bookings realtime (UPDATE) payload:', payload)
+                const rawId = (payload.new as any)?.listing_id ?? (payload.old as any)?.listing_id
+                const changedListingId = typeof rawId === 'string' ? Number(rawId) : rawId
+                const listingIdsNum = listingIds.map((id) => Number(id))
+                console.log('Changed listing id:', changedListingId, 'Listing IDs:', listingIdsNum)
+                if (!Number.isNaN(changedListingId) && listingIdsNum.includes(changedListingId)) {
+                    fetchBookingRequests(listingIdsNum)
                 }
             })
             .subscribe()
@@ -98,6 +111,18 @@ export default function LandlordDashboardPage() {
         return () => {
             supabase.removeChannel(channel)
         }
+    }, [listings])
+
+    // Poll as a fallback for realtime updates (runs every 10s)
+    useEffect(() => {
+        if (!listings || listings.length === 0) return
+
+        const listingIds = listings.map((l) => l.id)
+        const interval = setInterval(() => {
+            fetchBookingRequests(listingIds)
+        }, 10000)
+
+        return () => clearInterval(interval)
     }, [listings])
 
     async function handleDelete(id: number) {
