@@ -27,9 +27,10 @@ export default function ListingCarousel({ images, alt }: ListingCarouselProps) {
     <div className="mb-8">
       <div className="relative w-full h-72 rounded-2xl overflow-hidden bg-slate-100 shadow-sm">
         <img
+          key={activeIndex}
           src={images[activeIndex]}
           alt={alt ?? `Image ${activeIndex + 1}`}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-opacity duration-300 ease-in-out"
         />
 
         {images.length > 1 && (
@@ -37,7 +38,7 @@ export default function ListingCarousel({ images, alt }: ListingCarouselProps) {
             <button
               type="button"
               onClick={goPrevious}
-              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow hover:bg-white"
+              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow hover:bg-white transition-all duration-200 hover:shadow-md"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-5 h-5 text-slate-700" />
@@ -45,7 +46,7 @@ export default function ListingCarousel({ images, alt }: ListingCarouselProps) {
             <button
               type="button"
               onClick={goNext}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow hover:bg-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow hover:bg-white transition-all duration-200 hover:shadow-md"
               aria-label="Next image"
             >
               <ChevronRight className="w-5 h-5 text-slate-700" />
@@ -61,8 +62,8 @@ export default function ListingCarousel({ images, alt }: ListingCarouselProps) {
               key={`${image}-${index}`}
               type="button"
               onClick={() => setActiveIndex(index)}
-              className={`h-2.5 w-2.5 rounded-full transition ${
-                index === activeIndex ? 'bg-[#0075ff]' : 'bg-slate-300 hover:bg-slate-400'
+              className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
+                index === activeIndex ? 'bg-[#0075ff] w-8' : 'bg-slate-300 hover:bg-slate-400'
               }`}
               aria-label={`Go to image ${index + 1}`}
             />
