@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import ListingSearchMap from '@/app/components/ListingSearchMap'
 import { supabase } from '@/lib/supabase'
 import { Search, Shield, DollarSign, Building2, ArrowRight, MapPin, Calendar, User, HomeIcon } from 'lucide-react'
 
@@ -13,17 +14,17 @@ export default async function Home() {
       <section className="relative bg-gradient-to-br from-[#0075ff] via-[#0075ff] to-indigo-700 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0053d1]/50" />
         <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32">
-          <div className="max-w-3xl">
-            <span className="inline-block bg-white/20 text-white text-sm px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
-              Find your mansion
-            </span>
+          <div className="mx-auto max-w-4xl text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
               <span className="block text-[#cce4ff]">Prepared Home</span>
             </h1>
             <p className="text-xl text-[#e6f0ff] mb-10 leading-relaxed">
               Connect with verified landlords, explore properties, and find your next home with confidence.
             </p>
-           
+
+            <div className="mx-auto w-full">
+              <ListingSearchMap listings={activeListings} />
+            </div>
           </div>
         </div>
       </section>
