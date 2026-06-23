@@ -4,6 +4,7 @@ import { Search, Shield, DollarSign, Building2, ArrowRight, MapPin, Calendar, Us
 
 export default async function Home() {
   const { data: listings } = await supabase.from('Listings').select('*')
+  const activeListings = (listings || []).filter((listing: any) => !listing.archived)
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -74,7 +75,7 @@ export default async function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings?.map((listing) => (
+            {activeListings.map((listing) => (
               <Link key={listing.id} href={`/listings/${listing.id}`}>
                 <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition border border-slate-100 overflow-hidden">
                   <div className="h-48 overflow-hidden">
@@ -163,23 +164,32 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-slate-900 to-slate-800">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Ready to find your mansion?
-          </h2>
-          <p className="text-xl text-slate-300 mb-10">
-            Join thousands of happy tenants and landlords on Prepared Home
-          </p>
-          <Link href="/signup">
-            <button className="bg-[#0075ff] hover:bg-[#0053d1] h-14 px-10 rounded-xl text-lg font-semibold text-white flex items-center gap-2 mx-auto">
-              Get Started Free
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </Link>
+      {/* Footer Section */}
+      <footer className="border-t border-slate-200 bg-slate-950 text-slate-300">
+        <div className="max-w-7xl mx-auto px-6 py-10">
+          <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xl font-semibold text-white">Prepared Home</p>
+              <p className="mt-2 max-w-xl text-sm text-slate-400">
+                Your trusted rental marketplace for tenants and landlords. Find secure listings and manage bookings all in one place.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:gap-8">
+              <Link href="/about" className="text-slate-300 hover:text-white font-medium">
+                About
+              </Link>
+              <Link href="/legal" className="text-slate-300 hover:text-white font-medium">
+                Legal
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-8 border-t border-slate-800 pt-6 text-xs text-slate-500">
+            &copy; {new Date().getFullYear()} Prepared Home. All rights reserved.
+          </div>
         </div>
-      </section>
+      </footer>
 
     </div>
   )

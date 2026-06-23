@@ -10,6 +10,7 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
     const [date, setDate] = useState('')
     const [duration, setDuration] = useState('')
     const [message, setMessage] = useState('')
+    const [depositAmount, setDepositAmount] = useState('')
 
     useEffect(() => {
         async function getParams() {
@@ -18,6 +19,28 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
         }
         getParams()
     }, [])
+
+    useEffect(() => {
+        async function fetchDeposit() {
+            if (!listingId) return
+            const { data: listing, error } = await supabase.from('Listings').select('deposit').eq('id', listingId).single()
+            if (error) {
+                console.error('Failed to fetch listing deposit', error)
+                return
+            }
+            const deposit = listing?.deposit ?? null
+            if (deposit !== null && deposit !== undefined && deposit !== '') {
+                const amt = Number(deposit)
+                if (!isNaN(amt)) {
+                    setDepositAmount(amt.toFixed(2))
+                    return
+                }
+            }
+            // fallback to a default amount if deposit missing
+            setDepositAmount('1000.00')
+        }
+        fetchDeposit()
+    }, [listingId])
 
     async function handleBooking() {
         const { data } = await supabase.auth.getSession()
@@ -38,15 +61,22 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
         } else {
             const origin = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_BASE_URL || 'https://prepared-home.vercel.app'
 
-            const payfastparams = new URLSearchParams({
-                merchant_id: process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_ID!,
-                merchant_key: process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_KEY!,
-                amount: '500.00',
-                item_name: 'Rental Deposit',
-                return_url: `${origin}/booking/success`,
-                cancel_url: `${origin}/booking/cancel`,
-            })
-            window.location.href = `https://sandbox.payfast.co.za/eng/process?${payfastparams}`
+            try {
+                const merchant_id = String(process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_ID || '')
+                const merchant_key = String(process.env.NEXT_PUBLIC_PAYFAST_MERCHANT_KEY || '')
+                const payfastparams = new URLSearchParams({
+                    merchant_id,
+                    merchant_key,
+                    amount: depositAmount || '500.00',
+                    item_name: 'Rental Deposit',
+                    return_url: `${origin}/booking/success`,
+                    cancel_url: `${origin}/booking/cancel`,
+                })
+                window.location.href = 'https://sandbox.payfast.co.za/eng/process?' + payfastparams.toString()
+            } catch (err) {
+                console.error('PayFast redirect error', err)
+                alert('Failed to start payment. Please try again.')
+            }
         }
     }
 
@@ -110,6 +140,10 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
 
                         <div className="bg-[#eff4ff] rounded-xl p-4 text-sm text-[#0053d1]">
                             💳 You will be redirected to PayFast to pay your deposit securely after confirming.
+                        </div>
+
+                        <div className="text-sm text-slate-700 mt-2">
+                            <span className="font-medium">Amount:</span> {depositAmount ? `R ${depositAmount}` : 'R 500.00'}
                         </div>
 
                         <button

@@ -26,18 +26,27 @@ export default function LandlordDashboardPage() {
     const [requestLoading, setRequestLoading] = useState<{ [key: number]: boolean }>({})
     const [requestBanner, setRequestBanner] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
+    const [activeView, setActiveView] = useState<'active' | 'archived'>('active')
+    const activeListings = listings.filter((listing) => !listing.archived)
+    const archivedListings = listings.filter((listing) => listing.archived)
+
     async function fetchBookingRequests(listingIds: number[]) {
         if (listingIds.length === 0) {
             setBookingRequests([])
             return
         }
 
+        const listingIdsNum = listingIds.map((id) => Number(id)).filter((n) => !Number.isNaN(n))
+        console.log('fetchBookingRequests listingIds:', listingIds, 'coerced:', listingIdsNum)
+
         const { data: bookingsData, error } = await supabase
             .from('Bookings')
             .select('*, Listings(*)')
-            .in('listing_id', listingIds)
+            .in('listing_id', listingIdsNum)
             .eq('status', 'pending')
             .order('created_at', { ascending: false })
+
+        console.log('fetchBookingRequests result:', { bookingsData, error })
 
         if (error) {
             console.error('Failed to load booking requests:', error)
@@ -71,6 +80,7 @@ export default function LandlordDashboardPage() {
         setListings(listingsData || [])
 
         const listingIds = (listingsData || []).map((listing: any) => listing.id)
+        console.log('Landlord loadData userId:', userId, 'listingIds:', listingIds)
         await fetchBookingRequests(listingIds)
     }
 
@@ -125,13 +135,36 @@ export default function LandlordDashboardPage() {
         return () => clearInterval(interval)
     }, [listings])
 
-    async function handleDelete(id: number) {
-        const { error } = await supabase.from('Listings').delete().eq('id', id)
+    async function handleArchive(id: number) {
+        const { error } = await supabase.from('Listings').update({ archived: true }).eq('id', id)
+        const updatedListings = listings.map((listing) => listing.id === id ? { ...listing, archived: true } : listing)
+        setListings(updatedListings)
+
         if (error) {
-            alert(error.message)
-        } else {
-            setListings(listings.filter((listing) => listing.id !== id))
+            setRequestBanner({
+                type: 'success',
+                message: 'Listing archived on the website. (Database update failed or archived column is missing.)',
+            })
+            return
         }
+
+        setRequestBanner({ type: 'success', message: 'Listing archived successfully.' })
+    }
+
+    async function handleUnarchive(id: number) {
+        const { error } = await supabase.from('Listings').update({ archived: false }).eq('id', id)
+        const updatedListings = listings.map((listing) => listing.id === id ? { ...listing, archived: false } : listing)
+        setListings(updatedListings)
+
+        if (error) {
+            setRequestBanner({
+                type: 'success',
+                message: 'Listing restored on the website. (Database update failed or archived column is missing.)',
+            })
+            return
+        }
+
+        setRequestBanner({ type: 'success', message: 'Listing restored and visible on home page again.' })
     }
 
     async function handleBookingDecision(bookingId: number, newStatus: string) {
@@ -163,16 +196,16 @@ export default function LandlordDashboardPage() {
         }
 
         if (newStatus === 'confirmed') {
-            const { error: deleteError } = await supabase.from('Listings')
-                .delete()
+            const { error: archiveError } = await supabase.from('Listings')
+                .update({ archived: true })
                 .eq('id', bookingRequest.listing_id)
 
-            if (deleteError) {
-                setRequestBanner({ type: 'error', message: `Booking confirmed, but failed to remove listing: ${deleteError.message}` })
+            if (archiveError) {
+                setRequestBanner({ type: 'error', message: `Booking confirmed, but failed to archive listing: ${archiveError.message}` })
                 return
             }
 
-            setListings((current) => current.filter((listing) => listing.id !== bookingRequest.listing_id))
+            setListings((current) => current.map((listing) => listing.id === bookingRequest.listing_id ? { ...listing, archived: true } : listing))
         }
 
         const messageContent = newStatus === 'confirmed'
@@ -199,7 +232,7 @@ export default function LandlordDashboardPage() {
         setRequestBanner({
             type: 'success',
             message: newStatus === 'confirmed'
-                ? 'Booking approved successfully and listing taken down.'
+                ? 'Booking approved successfully and listing archived on site.'
                 : 'Booking request declined.',
         })
     }
@@ -209,17 +242,35 @@ export default function LandlordDashboardPage() {
             <div className="max-w-4xl mx-auto px-6 py-12">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-slate-900">My Listings</h1>
                         <p className="text-slate-500 mt-1">Manage your rental properties</p>
                     </div>
-                    <Link href="/landlord/listings/new">
-                        <button className="flex items-center gap-2 bg-[#0075ff] hover:bg-[#0053d1] text-white font-semibold px-5 py-3 rounded-xl transition">
-                            <Plus className="w-5 h-5" />
-                            New Listing
-                        </button>
-                    </Link>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                        <div className="flex gap-2 rounded-full border border-slate-200 bg-slate-50 p-1">
+                            <button
+                                type="button"
+                                onClick={() => setActiveView('active')}
+                                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeView === 'active' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:bg-white'}`}
+                            >
+                                Active
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setActiveView('archived')}
+                                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${activeView === 'archived' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:bg-white'}`}
+                            >
+                                Archived
+                            </button>
+                        </div>
+                        <Link href="/landlord/listings/new">
+                            <button className="flex items-center gap-2 bg-[#0075ff] hover:bg-[#0053d1] text-white font-semibold px-5 py-3 rounded-xl transition">
+                                <Plus className="w-5 h-5" />
+                                New Listing
+                            </button>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Listings */}
@@ -337,84 +388,128 @@ export default function LandlordDashboardPage() {
                         <section className="flex flex-col gap-4">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h2 className="text-xl font-semibold text-slate-900">Your Listings</h2>
-                                    <p className="text-slate-500 text-sm">Manage and edit all properties you currently have listed.</p>
+                                    <h2 className="text-xl font-semibold text-slate-900">{activeView === 'active' ? 'Your Active Listings' : 'Archived Listings'}</h2>
+                                    <p className="text-slate-500 text-sm">
+                                        {activeView === 'active'
+                                            ? 'Manage and edit all active properties you currently have listed.'
+                                            : 'Restore archived listings so they appear on the home page again.'}
+                                    </p>
                                 </div>
                             </div>
 
-                            {listings.map((listing: any) => {
-                                const images = getListingImages(listing.image_url)
-                                return (
-                                <div key={listing.id} className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
-                                    {/* Listing Images */}
-                                    {images.length > 0 && <ListingCarousel images={images} alt={listing.Title} />}
+                            {activeView === 'active' ? (
+                                activeListings.length === 0 ? (
+                                    <div className="rounded-2xl border border-slate-200 p-8 text-center text-slate-500">
+                                        You have no active listings right now. Switch to Archived to restore listings or create a new one.
+                                    </div>
+                                ) : activeListings.map((listing: any) => {
+                                    const images = getListingImages(listing.image_url)
+                                    return (
+                                    <div key={listing.id} className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+                                        {/* Listing Images */}
+                                        {images.length > 0 && <ListingCarousel images={images} alt={listing.Title} />}
 
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-slate-900 mb-2">{listing?.Title}</h3>
-                                            
-                                            {/* Location & Price */}
-                                            <div className="flex items-center gap-4 mb-3">
-                                                <div className="flex items-center gap-1 text-slate-500 text-sm">
-                                                    <MapPin className="w-4 h-4" />
-                                                    {listing?.Location}
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                <h3 className="text-lg font-semibold text-slate-900 mb-2">{listing?.Title}</h3>
+                                                
+                                                {/* Location & Price */}
+                                                <div className="flex items-center gap-4 mb-3">
+                                                    <div className="flex items-center gap-1 text-slate-500 text-sm">
+                                                        <MapPin className="w-4 h-4" />
+                                                        {listing?.Location}
+                                                    </div>
+                                                    <p className="text-[#0075ff] font-bold text-lg">R {listing?.Price}/month</p>
                                                 </div>
-                                                <p className="text-[#0075ff] font-bold text-lg">R {listing?.Price}/month</p>
-                                            </div>
 
-                                            {/* Details Grid */}
-                                            <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
-                                                {listing?.rooms && (
-                                                    <div className="flex items-center gap-2 text-slate-600">
-                                                        <Building2 className="w-4 h-4 text-[#0075ff]" />
-                                                        <span>{listing.rooms} rooms</span>
-                                                    </div>
-                                                )}
-                                                {listing?.room_type && (
-                                                    <div className="flex items-center gap-2 text-slate-600">
-                                                        <Tag className="w-4 h-4 text-[#0075ff]" />
-                                                        <span>{listing.room_type}</span>
-                                                    </div>
-                                                )}
-                                                {listing?.amenities && (
-                                                    <div className="flex items-center gap-2 text-slate-600">
-                                                        <Grid3X3 className="w-4 h-4 text-[#0075ff]" />
-                                                        <span className="line-clamp-1">{listing.amenities}</span>
-                                                    </div>
-                                                )}
-                                                {listing?.availability_date && (
-                                                    <div className="flex items-center gap-2 text-slate-600">
-                                                        <Calendar className="w-4 h-4 text-[#0075ff]" />
-                                                        <span>{new Date(listing.availability_date).toLocaleDateString()}</span>
-                                                    </div>
+                                                {/* Details Grid */}
+                                                <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
+                                                    {listing?.rooms && (
+                                                        <div className="flex items-center gap-2 text-slate-600">
+                                                            <Building2 className="w-4 h-4 text-[#0075ff]" />
+                                                            <span>{listing.rooms} rooms</span>
+                                                        </div>
+                                                    )}
+                                                    {listing?.room_type && (
+                                                        <div className="flex items-center gap-2 text-slate-600">
+                                                            <Tag className="w-4 h-4 text-[#0075ff]" />
+                                                            <span>{listing.room_type}</span>
+                                                        </div>
+                                                    )}
+                                                    {listing?.amenities && (
+                                                        <div className="flex items-center gap-2 text-slate-600">
+                                                            <Grid3X3 className="w-4 h-4 text-[#0075ff]" />
+                                                            <span className="line-clamp-1">{listing.amenities}</span>
+                                                        </div>
+                                                    )}
+                                                    {listing?.availability_date && (
+                                                        <div className="flex items-center gap-2 text-slate-600">
+                                                            <Calendar className="w-4 h-4 text-[#0075ff]" />
+                                                            <span>{new Date(listing.availability_date).toLocaleDateString()}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {listing?.deposit && (
+                                                    <p className="text-xs text-slate-500 mb-4">
+                                                        <span className="font-medium">Deposit:</span> R {listing.deposit}
+                                                    </p>
                                                 )}
                                             </div>
-
-                                            {listing?.deposit && (
-                                                <p className="text-xs text-slate-500 mb-4">
-                                                    <span className="font-medium">Deposit:</span> R {listing.deposit}
-                                                </p>
-                                            )}
-                                        </div>
-                                        
-                                        {/* Action Buttons */}
-                                        <div className="flex items-center gap-2 ml-4">
-                                            <Link href={`/landlord/listings/${listing.id}/edit`}>
-                                                <button className="flex items-center gap-1 border border-slate-200 text-slate-600 hover:border-[#7fb8ff] hover:text-[#0075ff] text-sm font-medium px-4 py-2 rounded-xl transition">
-                                                    <Pencil className="w-4 h-4" />
-                                                    Edit
+                                            
+                                            {/* Action Buttons */}
+                                            <div className="flex items-center gap-2 ml-4">
+                                                <Link href={`/landlord/listings/${listing.id}/edit`}>
+                                                    <button className="flex items-center gap-1 border border-slate-200 text-slate-600 hover:border-[#7fb8ff] hover:text-[#0075ff] text-sm font-medium px-4 py-2 rounded-xl transition">
+                                                        <Pencil className="w-4 h-4" />
+                                                        Edit
+                                                    </button>
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleArchive(listing.id)}
+                                                    className="flex items-center gap-1 border border-slate-200 text-slate-600 hover:border-red-300 hover:text-red-500 text-sm font-medium px-4 py-2 rounded-xl transition"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                    Archive
                                                 </button>
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(listing.id)}
-                                                className="flex items-center gap-1 border border-slate-200 text-slate-600 hover:border-red-300 hover:text-red-500 text-sm font-medium px-4 py-2 rounded-xl transition"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                                Delete
-                                            </button>
+                                            </div>
                                         </div>
                                     </div>
+                                    )
+                                })
+                            ) : archivedListings.length === 0 ? (
+                                <div className="rounded-2xl border border-slate-200 p-8 text-center text-slate-500">
+                                    There are no archived listings yet.
                                 </div>
+                            ) : archivedListings.map((listing: any) => {
+                                const images = getListingImages(listing.image_url)
+                                return (
+                                    <div key={listing.id} className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-28 h-20 rounded-2xl overflow-hidden bg-slate-100">
+                                                {images.length > 0 ? (
+                                                    <img src={images[0]} alt={listing.Title} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="flex h-full items-center justify-center text-slate-400 text-xs">No image</div>
+                                                )}
+                                            </div>
+
+                                            <div className="flex-1">
+                                                <p className="text-sm text-slate-500">{listing.Title}</p>
+                                                <h3 className="text-lg font-semibold text-slate-900">{listing.Location}</h3>
+                                                <p className="text-[#0075ff] font-bold text-lg mt-2">R {listing.Price}/month</p>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => handleUnarchive(listing.id)}
+                                                    className="rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-2 text-sm font-semibold transition hover:bg-emerald-100"
+                                                >
+                                                    Unarchive
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 )
                             })}
                         </section>
