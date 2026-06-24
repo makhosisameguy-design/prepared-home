@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter, usePathname } from 'next/navigation'
 import { MessageSquare, LayoutDashboard, Building2, LogOut, LogIn, UserPlus, Menu, X } from 'lucide-react'
@@ -12,62 +12,77 @@ export default function Navbar() {
     const [isLandlord, setIsLandlord] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
     const pathname = usePathname()
+    const containerRef = useRef<HTMLDivElement | null>(null)
 
-   useEffect(() => {
-    async function checkSession() {
-        const { data } = await supabase.auth.getSession()
-        const session = data.session
-        setIsLoggedIn(!!session)
+    // Close mobile menu when clicking outside of it
+    useEffect(() => {
+        if (!mobileOpen) return
 
-        if (session) {
-            const accountType = (session.user.user_metadata as any)?.account_type
-if (accountType === 'landlord')  {
-                setIsLandlord(true)
-            } else {
-                try {
-                    const { data: listingsData } = await supabase.from('Listings').select('id').eq('landlord_id', session.user.id).limit(1)
-                    setIsLandlord(!!(listingsData && listingsData.length > 0))
-                } catch (err) {
-                    setIsLandlord(false)
-                }
+        function handleDocumentClick(event: MouseEvent) {
+            if (!containerRef.current) return
+            if (event.target instanceof Node && !containerRef.current.contains(event.target)) {
+                setMobileOpen(false)
             }
-        } else {
-            setIsLandlord(false)
         }
-    }
-    checkSession()
 
-    // Listen for login/logout changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-        setIsLoggedIn(!!session)
-        if (session) {
-            const accountType = (session.user.user_metadata as any)?.account_type
-            if (accountType === 'landlord') {
-                setIsLandlord(true)
+        document.addEventListener('click', handleDocumentClick)
+        return () => document.removeEventListener('click', handleDocumentClick)
+    }, [mobileOpen])
+
+    useEffect(() => {
+        async function checkSession() {
+            const { data } = await supabase.auth.getSession()
+            const session = data.session
+            setIsLoggedIn(!!session)
+
+            if (session) {
+                const accountType = (session.user.user_metadata as any)?.account_type
+                if (accountType === 'landlord') {
+                    setIsLandlord(true)
+                } else {
+                    try {
+                        const { data: listingsData } = await supabase.from('Listings').select('id').eq('landlord_id', session.user.id).limit(1)
+                        setIsLandlord(!!(listingsData && listingsData.length > 0))
+                    } catch (err) {
+                        setIsLandlord(false)
+                    }
+                }
             } else {
-                ;(async () => {
-    try {
-        const { data: listingsData } = await supabase.from('Listings').select('id').eq('landlord_id', session.user.id).limit(1)
-            setIsLandlord(!!(listingsData && listingsData.length > 0))
-            } catch {
                 setIsLandlord(false)
             }
-        })()
-            }
-        } else {
-            setIsLandlord(false)
         }
-    })
+        checkSession()
 
-    // Cleanup listener when navbar unmounts
-    return () => {
-        subscription.unsubscribe()
-    }
-}, [])
+        // Listen for login/logout changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            setIsLoggedIn(!!session)
+            if (session) {
+                const accountType = (session.user.user_metadata as any)?.account_type
+                if (accountType === 'landlord') {
+                    setIsLandlord(true)
+                } else {
+                    ;(async () => {
+                        try {
+                            const { data: listingsData } = await supabase.from('Listings').select('id').eq('landlord_id', session.user.id).limit(1)
+                            setIsLandlord(!!(listingsData && listingsData.length > 0))
+                        } catch {
+                            setIsLandlord(false)
+                        }
+                    })()
+                }
+            } else {
+                setIsLandlord(false)
+            }
+        })
 
-// derive visibility from current pathname so it updates on client navigation
+        // Cleanup listener when navbar unmounts
+        return () => {
+            subscription.unsubscribe()
+        }
+    }, [])
 
     async function handleLogout() {
+        setMobileOpen(false)
         await supabase.auth.signOut()
         router.push('/')
     }
@@ -75,7 +90,7 @@ if (accountType === 'landlord')  {
     if (pathname?.startsWith('/booking/success') || pathname?.startsWith('/booking/cancel')) return null
 
     return (
-        <nav className="bg-white border-b border-slate-100 sticky top-0 z-50 relative">
+        <nav ref={containerRef} className="bg-white border-b border-slate-100 sticky top-0 z-50 relative">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-16 flex items-center justify-start sm:justify-between gap-4">
                 <div className="flex items-center gap-2">
                     <button
@@ -144,25 +159,25 @@ if (accountType === 'landlord')  {
                 </div>
             </div>
 
-            <div className={`${mobileOpen ? 'flex' : 'hidden'} sm:hidden flex-col gap-2 bg-white border-b border-slate-100 px-4 pb-4`}>                
-                <Link href="/about" className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
+            <div className={`${mobileOpen ? 'flex' : 'hidden'} sm:hidden flex-col gap-2 bg-white border-b border-slate-100 px-4 pb-4`}>
+                <Link href="/about" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
                     About
                 </Link>
-                <Link href="/legal" className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
+                <Link href="/legal" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
                     Legal
                 </Link>
                 {isLoggedIn && (
                     <>
-                        <Link href="/messages" className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
+                        <Link href="/messages" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
                             <MessageSquare className="w-4 h-4" />
                             Messages
                         </Link>
-                        <Link href="/dashboard" className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
+                        <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
                             <LayoutDashboard className="w-4 h-4" />
                             My Bookings
                         </Link>
                         {isLandlord && (
-                            <Link href="/landlord/dashboard" className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
+                            <Link href="/landlord/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
                                 <Building2 className="w-4 h-4" />
                                 Landlord
                             </Link>
@@ -180,11 +195,11 @@ if (accountType === 'landlord')  {
                     </button>
                 ) : (
                     <>
-                        <Link href="/login" className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
+                        <Link href="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 hover:text-[#0075ff] hover:bg-slate-50 transition text-sm font-medium">
                             <LogIn className="w-4 h-4" />
                             Login
                         </Link>
-                        <Link href="/signup" className="flex items-center gap-2 rounded-lg px-3 py-2 bg-[#0075ff] hover:bg-[#0053d1] text-white transition text-sm font-medium justify-center">
+                        <Link href="/signup" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 bg-[#0075ff] hover:bg-[#0053d1] text-white transition text-sm font-medium justify-center">
                             <UserPlus className="w-4 h-4" />
                             Sign Up
                         </Link>
