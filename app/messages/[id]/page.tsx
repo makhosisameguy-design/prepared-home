@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Send } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 
 export default function ConversationPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter()
@@ -81,7 +83,9 @@ export default function ConversationPage({ params }: { params: Promise<{ id: str
 
                 {/* Header */}
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-slate-900">Conversation</h1>
+                    <Link href="/messages" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm font-medium transition group mb-6">
+                        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" /> Back
+                    </Link>
                 </div>
 
                 {/* Messages */}
